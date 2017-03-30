@@ -5,6 +5,7 @@ Usage:
 
 ```php
 $passed = \Sanito\Validator::validate([
-    'username' => ['teststring' , 'required|bogus'],
-    'password' => ['password' , 'required|maxLength:20']
+    'username' => ['teststring' , 'required'],
+    'password' => ['password' , 'required|maxLength:32'],
+    'email' => ['@example.com', 'email|required']
 ]);
