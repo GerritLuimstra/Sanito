@@ -1,5 +1,5 @@
 # Sanito
-The lightweight Validator / Sanitizer built using PHP
+The tiny lightweight Validator built using PHP
 
 Usage:
 
