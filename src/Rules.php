@@ -32,13 +32,18 @@ trait Rules {
         return is_bool($s);
     }
 
-
-
     /*
      * Returns true if a given string is equal or smaller than the given max length
      */
     private static function maxLength($s, $length){
         return mb_strlen($s) <= $length;
+    }
+
+    /*
+     * Returns true if a given string is higher or equal than the given min length
+     */
+    private static function minLength($s, $length){
+        return mb_strlen($s) >= $length;
     }
 
     /*

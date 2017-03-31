@@ -7,10 +7,7 @@ class Validator
 {
     use Rules;
 
-    private function __construct()
-    {
-        // We only want to be using this class statically, Sorry! ;)
-    }
+    private function __construct() { /* We only want to be using this class statically, Sorry! */ }
 
     public static function validate($checks){
         $passed = true;
@@ -29,10 +26,8 @@ class Validator
             $rules = self::getRules($rulesString);
 
             // Check if the given string matches the rules
-            $valid = self::valid($value, $rules);
-
             // If not, set the passed to false and stop further checking
-            if(!$valid) {
+            if(!self::valid($value, $rules)) {
                 $passed = false;
                 break;
             }
@@ -63,27 +58,59 @@ class Validator
     }
 
     /*
-     * Returns if the value meets the rule
+     * Returns true if the value meets the rule
      */
     private static function checkRule($value, $rule){
-        // Check if the rule has an associated method, if not: stop
-        if(!method_exists(__NAMESPACE__ . '\Validator', $rule)) return false;
 
-        // If the rule contains a dot, the next values will be parameters to the function
-        if(strpos('x' . $rule, ':') !== false){
-            // Extra parameters are found. Explode them to create an array of parameters
-            $snippets = explode(':', $rule);
-            // The first snippet will always be the rule. Extract this for later use
-            $rule = $snippets[0];
-            // A little hack, to combine the rule combined with the extra parameters as an array
-            $params = array_merge(array($value), array_slice($snippets, 1));
+        if(self::hasParameters($rule)){
 
-            // Execute the parameters to the function belonging to the given rule
-            return call_user_func_array(array(__NAMESPACE__ .'\Validator', $rule), $params);
+            $params = self::getParameters($rule, $value);
+
+            if(!self::ruleExists($rule)) return false;
+
+            return self::callWithParameters($rule, $params);
         }
+
+        if(!self::ruleExists($rule)) return false;
 
         // No extra parameters were found, execute the function as usual
         return self::$rule($value);
+    }
+
+    /*
+     * Returns true if the given rule has a matching function
+     */
+    private function ruleExists($rule)
+    {
+        return method_exists(__NAMESPACE__ . '\Validator', $rule);
+    }
+
+    /*
+     * Returns true of the rule has parameters
+     */
+    private function hasParameters($rule)
+    {
+        return strpos('x' . $rule, ':') !== false;
+    }
+
+    /*
+     * Returns the given parameters provided with the rule
+     */
+    private function getParameters($rule, $value)
+    {
+        // Extra parameters are found. Explode them to create an array of parameters
+        $snippets = explode(':', $rule);
+        // The first snippet will always be the rule. Extract this for later use
+        $rule = $snippets[0];
+        // A little hack, to combine the rule combined with the extra parameters as an array
+        $params = array_merge(array($value), array_slice($snippets, 1));
+    }
+
+    /*
+     * Execute the parameters to the function belonging to the given rule
+     */
+    private function callWithParameters($rule, $params){
+        return call_user_func_array(array(__NAMESPACE__ .'\Validator', $rule), $params);
     }
 
 }
